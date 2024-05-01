@@ -8,20 +8,18 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  // Query,
 } from '@nestjs/common';
+import { ProductsService } from 'src/services/products/products.service';
 
 @Controller('products')
 export class ProductsController {
+  constructor(private productsServices: ProductsService) {}
+
   @Get('')
-  getProds(
-    @Query('limit') limit: number = 100,
-    @Query('offset') offset: number = 0,
-    @Query('brand') brand: string,
-  ) {
-    return {
-      message: `Return products from page ${limit} of ${offset} of the brand ${brand}`,
-    };
+  getProds() {
+    // @Query('brand') brand: string, // @Query('offset') offset: number = 0, // @Query('limit') limit: number = 100,
+    return this.productsServices.findAll();
   }
 
   @Get('text')
@@ -32,24 +30,21 @@ export class ProductsController {
   @Get(':prodId')
   @HttpCode(HttpStatus.ACCEPTED)
   getProd(@Param('prodId') prodId: string) {
-    return { message: `Product id: ${prodId}` };
+    return this.productsServices.findOne(+prodId);
   }
 
   @Post()
   create(@Body() payload: any) {
-    return {
-      message: 'Create Action',
-      payload,
-    };
+    return this.productsServices.create(payload);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() payload: any) {
-    return { id, payload };
+  update(@Param('id') id: string, @Body() payload: any) {
+    return this.productsServices.update(+id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return id;
+  delete(@Param('id') id: string) {
+    return this.productsServices.delete(+id);
   }
 }
